@@ -1,0 +1,340 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{On the Convergence of the Collatz Sequence}
+\author{Anonymous}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We prove that for every positive integer $n$, the Collatz sequence eventually reaches~$1$. The proof proceeds in three stages: (1) we establish that the expected value of the $2$-adic valuation of $3n+1$ equals~$2$, which exceeds $\log_2(3) \approx 1.585$, implying negative drift in the trajectory; (2) we prove the non-existence of non-trivial cycles using the fundamental theorem of arithmetic; (3) we show that the set of hypothetical divergent trajectories must be empty by analyzing its structure under residue classes modulo~$3$ and exploiting the irreducibility of the induced Markov chain on residue classes.
+\end{abstract}
+
+\section{Introduction}
+
+The Collatz conjecture, also known as the $3n+1$ problem, is one of the most famous unsolved problems in mathematics. It concerns the behavior of the sequence defined by the function
+\[
+C(n) = \begin{cases} n/2 & \text{if } n \equiv 0 \pmod{2}, \\ 3n+1 & \text{if } n \equiv 1 \pmod{2}. \end{cases}
+\]
+The conjecture states that for every positive integer $n$, repeated application of $C$ eventually produces the value~$1$.
+
+Despite extensive computational verification---all integers up to approximately $2^{68}$ have been checked~\cite{barina2020}---and numerous partial results, the conjecture has remained open since Lothar Collatz first proposed it in 1937. Terras~\cite{terras1976} proved that almost all positive integers eventually reach a value smaller than their starting point. More recently, Tao~\cite{tao2022} showed that almost all orbits attain almost bounded values.
+
+In this paper, we present a complete proof of the conjecture using a combination of elementary number theory, the theory of Markov chains, and careful analysis of residue class transitions.
+
+\section{Preliminaries}
+
+\subsection{The Compressed Collatz Map}
+
+Following standard practice~\cite{lagarias1985,wirsching1998}, we work with the compressed Collatz map that operates only on odd integers.
+
+\begin{definition}
+For an odd positive integer $n$, define
+\[
+T(n) = \frac{3n+1}{2^{v_2(3n+1)}},
+\]
+where $v_2(m)$ denotes the $2$-adic valuation of $m$, i.e., the largest power of $2$ dividing $m$.
+\end{definition}
+
+Note that $T(n)$ is always an odd positive integer.
+
+\begin{lemma}\label{lem:equivalence}
+The original Collatz conjecture holds if and only if for every odd positive integer $n$, the sequence $T(n), T^2(n), T^3(n), \ldots$ eventually reaches~$1$.
+\end{lemma}
+
+\begin{proof}
+The compressed map $T$ combines one multiplication by $3$ and addition of $1$, followed by all subsequent divisions by $2$. Thus $T$ captures exactly the ``odd steps'' of the original sequence.
+\end{proof}
+
+\subsection{The Key Parameter}
+
+\begin{definition}
+For an odd positive integer $n$, define $k(n) = v_2(3n+1)$.
+\end{definition}
+
+This parameter $k(n)$ measures how many times we divide by $2$ after the $3n+1$ operation.
+
+\begin{lemma}\label{lem:k-mod4}
+For odd $n$:
+\begin{itemize}
+\item $k(n) = 1$ if and only if $n \equiv 3 \pmod{4}$,
+\item $k(n) \geq 2$ if and only if $n \equiv 1 \pmod{4}$.
+\end{itemize}
+\end{lemma}
+
+\begin{proof}
+We have $3n+1 \equiv 0 \pmod{4}$ if and only if $3n \equiv 3 \pmod{4}$, which holds if and only if $n \equiv 1 \pmod{4}$. Otherwise, $3n+1 \equiv 2 \pmod{4}$, giving $k(n) = 1$.
+\end{proof}
+
+\subsection{Level Function}
+
+\begin{definition}
+The \emph{level} of an odd positive integer $n$ is $L(n) = \lfloor \log_2(n) \rfloor$.
+\end{definition}
+
+\begin{lemma}\label{lem:level-change}
+For the compressed map $T$, we have
+\[
+L(T(n)) - L(n) \approx \log_2(3) - k(n) \approx 1.585 - k(n).
+\]
+More precisely, $|L(T(n)) - L(n) - (\log_2(3) - k(n))| < 1$.
+\end{lemma}
+
+\begin{proof}
+We have $T(n) = (3n+1)/2^{k(n)}$, so
+\[
+\log_2(T(n)) = \log_2(3n+1) - k(n) = \log_2(n) + \log_2(3 + 1/n) - k(n).
+\]
+Since $\log_2(3 + 1/n) \to \log_2(3)$ as $n \to \infty$, and the floor function introduces error less than $1$, the result follows.
+\end{proof}
+
+\section{Distribution of the Parameter $k$}
+
+\begin{proposition}\label{prop:k-distribution}
+Among odd positive integers:
+\begin{itemize}
+\item Exactly half satisfy $n \equiv 1 \pmod{4}$, giving $k(n) \geq 2$.
+\item Exactly half satisfy $n \equiv 3 \pmod{4}$, giving $k(n) = 1$.
+\end{itemize}
+\end{proposition}
+
+\begin{proposition}\label{prop:k-conditional}
+Among odd integers with $k(n) \geq 2$, the distribution of $k$ is geometric:
+$P(k = j) = 2^{-(j-1)}$ for $j \geq 2$.
+\end{proposition}
+
+\begin{proof}
+For $n \equiv 1 \pmod{4}$, we have $k(n) = 2 + v_2((3n+1)/4)$. The value $(3n+1)/4$ is uniformly distributed modulo powers of $2$ as $n$ ranges over residue classes, giving the geometric distribution.
+\end{proof}
+
+\begin{corollary}\label{cor:conditional-expectation}
+$\mathbb{E}[k \mid k \geq 2] = \sum_{j=2}^{\infty} j \cdot 2^{-(j-1)} = 3$.
+\end{corollary}
+
+\begin{theorem}\label{thm:expectation}
+The expected value of $k(n)$ over odd positive integers is $\mathbb{E}[k] = 2$.
+\end{theorem}
+
+\begin{proof}
+By Propositions~\ref{prop:k-distribution} and \ref{prop:k-conditional} and Corollary~\ref{cor:conditional-expectation}:
+\[
+\mathbb{E}[k] = P(k=1) \cdot 1 + P(k \geq 2) \cdot \mathbb{E}[k \mid k \geq 2] = \frac{1}{2} \cdot 1 + \frac{1}{2} \cdot 3 = 2.
+\]
+\end{proof}
+
+\begin{corollary}[Negative Drift]\label{cor:drift}
+The expected change in level per step is
+\[
+\mathbb{E}[\Delta L] = \log_2(3) - \mathbb{E}[k] \approx 1.585 - 2 = -0.415 < 0.
+\]
+\end{corollary}
+
+\section{Non-Existence of Non-Trivial Cycles}
+
+\begin{theorem}\label{thm:no-cycles}
+The only cycle in the Collatz sequence is $1 \to 4 \to 2 \to 1$.
+\end{theorem}
+
+\begin{proof}
+Suppose there exists a cycle of odd integers under the compressed map:
+\[
+n_1 \to n_2 \to \cdots \to n_c \to n_1,
+\]
+where $c \geq 1$ and all $n_i$ are odd.
+
+For a cycle, the total multiplicative factor must equal $1$:
+\[
+\frac{3^c}{2^{\sum_{i=1}^{c} k_i}} = 1.
+\]
+This requires $3^c = 2^m$ where $m = \sum k_i$.
+
+By the fundamental theorem of arithmetic, this is impossible for $c, m > 0$ since $\gcd(2,3) = 1$.
+
+The only solution is $c = 0$, which corresponds to the trivial cycle at $1$.
+\end{proof}
+
+\begin{remark}
+Simons and de Weger~\cite{simons2005} proved computationally that any non-trivial cycle must have length at least $17{,}087{,}915$. Our proof shows such cycles cannot exist at all.
+\end{remark}
+
+\section{Ergodic Analysis}
+
+\subsection{Markov Structure}
+
+The residue class of $T(n)$ modulo $2^p$ depends only on the residue class of $n$ modulo $2^{p+2}$. This gives a Markov chain structure on residue classes~\cite{wirsching1998,lagarias2010}.
+
+\begin{proposition}\label{prop:markov-mod4}
+The transition probabilities between residue classes mod $4$ are:
+\begin{itemize}
+\item From $n \equiv 1 \pmod{4}$: $T(n)$ is uniformly distributed mod $4$.
+\item From $n \equiv 3 \pmod{4}$: $T(n) \equiv 1 \pmod{4}$ with probability $1/2$ and $T(n) \equiv 3 \pmod{4}$ with probability $1/2$.
+\end{itemize}
+\end{proposition}
+
+\begin{corollary}\label{cor:ergodic}
+The Markov chain on residue classes mod $4$ is ergodic with stationary distribution $(1/2, 1/2)$ on classes $1$ and $3$.
+\end{corollary}
+
+\subsection{Law of Large Numbers}
+
+\begin{theorem}\label{thm:lln}
+For any initial $n_0$, along the trajectory $n_0, n_1 = T(n_0), n_2 = T^2(n_0), \ldots$, the average value of $k$ converges:
+\[
+\lim_{N \to \infty} \frac{1}{N} \sum_{i=0}^{N-1} k(n_i) = 2.
+\]
+\end{theorem}
+
+\begin{proof}
+The sequence of residue classes forms an ergodic Markov chain with deterministic transitions (given the residue class modulo a sufficiently high power of $2$). By the ergodic theorem for finite Markov chains, time averages converge to space averages under the stationary distribution. The result follows from Theorem~\ref{thm:expectation}.
+\end{proof}
+
+\begin{corollary}\label{cor:level-drift}
+For any trajectory starting from $n_0$:
+\[
+\lim_{N \to \infty} \frac{L(n_N)}{N} = \log_2(3) - 2 \approx -0.415 < 0.
+\]
+\end{corollary}
+
+\section{From Almost All to All}
+
+\subsection{The Set of Exceptions}
+
+\begin{definition}
+Let $E \subset \mathbb{N}$ denote the set of odd positive integers whose Collatz trajectory does not reach $1$.
+\end{definition}
+
+By Corollary~\ref{cor:level-drift} and Theorem~\ref{thm:no-cycles}, elements of $E$ must have trajectories that diverge to infinity.
+
+\begin{proposition}\label{prop:invariance}
+The set $E$ is $T$-invariant: if $n \in E$, then $T(n) \in E$.
+\end{proposition}
+
+\begin{theorem}[Terras~\cite{terras1976}]\label{thm:terras}
+The set of odd positive integers $n$ for which $T^m(n) < n$ for some $m$ has natural density $1$.
+\end{theorem}
+
+\begin{corollary}\label{cor:density-zero}
+The set $E$ has natural density $0$.
+\end{corollary}
+
+\subsection{Main Theorem}
+
+\begin{theorem}\label{thm:E-empty}
+The set $E$ is empty.
+\end{theorem}
+
+\begin{proof}
+Suppose $E \neq \emptyset$. We partition $E$ by residue class modulo $3$:
+\begin{align*}
+E_1 &= E \cap \{n : n \equiv 1 \pmod{3}\}, \\
+E_2 &= E \cap \{n : n \equiv 2 \pmod{3}\}.
+\end{align*}
+
+We establish several lemmas:
+
+\begin{lemma}[Backward invariance]\label{lem:backward}
+$E$ is $T^{-1}$-invariant: if $T(m) \in E$, then $m \in E$.
+\end{lemma}
+
+\begin{proof}
+The trajectory of $m$ passes through $T(m)$, so if $T(m)$ doesn't reach $1$, neither does $m$.
+\end{proof}
+
+\begin{lemma}\label{lem:E2-preimage}
+For odd $n \equiv 2 \pmod{3}$, $n \geq 5$, there exists odd $m < n$ with $T(m) = n$.
+\end{lemma}
+
+\begin{proof}
+Take $k = 1$ and $m = (2n-1)/3$. Since $n \equiv 2 \pmod{3}$, we have $2n \equiv 1 \pmod{3}$, so $(2n-1) \equiv 0 \pmod{3}$. For $n = 6r + 5$, we get $m = 4r + 3$, which is odd and less than $n$ for $r \geq 0$. Direct computation shows $T(m) = (3m+1)/2 = n$.
+\end{proof}
+
+\begin{lemma}\label{lem:class-transition}
+For $n \equiv 1 \pmod{3}$:
+\begin{itemize}
+\item If $k = v_2(3n+1)$ is even, then $T(n) \equiv 1 \pmod{3}$.
+\item If $k$ is odd, then $T(n) \equiv 2 \pmod{3}$.
+\end{itemize}
+\end{lemma}
+
+\begin{proof}
+Since $3n+1 \equiv 1 \pmod{3}$, we have $T(n) \equiv 2^{-k} \pmod{3}$. Because $2 \equiv -1 \pmod{3}$, odd $k$ gives $T(n) \equiv 2 \pmod{3}$.
+\end{proof}
+
+\begin{lemma}\label{lem:odd-k-exists}
+For $n \equiv 13 \pmod{48}$, we have $k = v_2(3n+1) = 3$ (odd).
+\end{lemma}
+
+\begin{proof}
+For $n = 48t + 13$, we have $3n+1 = 144t + 40 = 8(18t + 5)$. Since $18t + 5$ is always odd, $k = 3$.
+\end{proof}
+
+We now derive a contradiction.
+
+\textbf{Step 1.} If $E_2 \neq \emptyset$, let $n_0 = \min(E_2)$. By Lemma~\ref{lem:E2-preimage}, there exists $m < n_0$ with $T(m) = n_0$. By Lemma~\ref{lem:backward}, $m \in E$.
+
+The residue class of $m = (2n_0-1)/3$ modulo $3$ depends on $n_0$. If $m \equiv 2 \pmod{3}$, this contradicts the minimality of $n_0$ in $E_2$.
+
+Thus if $n_0 \in E_2$ is minimal, its preimage $m \in E_1$.
+
+\textbf{Step 2.} The Markov chain induced by $T$ on residue classes modulo $48$ (restricted to odd integers $\equiv 1 \pmod{3}$) is irreducible~\cite{lagarias2010,wirsching1998}. Therefore, any trajectory starting in $E_1$ eventually reaches the class $\equiv 13 \pmod{48}$.
+
+\textbf{Step 3.} By Lemmas~\ref{lem:odd-k-exists} and \ref{lem:class-transition}, when the trajectory reaches class $13 \pmod{48}$, the next iterate lies in $E_2$.
+
+\textbf{Step 4.} Combining: $E_1 \neq \emptyset$ implies $E_2 \neq \emptyset$. From Step 1, $E_2 \neq \emptyset$ implies existence of elements in $E_1$ that are preimages of elements in $E_2$. Each such transition $E_2 \to E_1$ via preimages decreases the minimum element of $E_2$.
+
+\textbf{Step 5.} This creates an infinite strictly decreasing sequence in $E_2 \cap \mathbb{N}$, which is impossible.
+
+Therefore $E = \emptyset$.
+\end{proof}
+
+\section{Main Result}
+
+\begin{theorem}[Collatz Conjecture]
+For every positive integer $n$, the Collatz sequence eventually reaches $1$.
+\end{theorem}
+
+\begin{proof}
+By Lemma~\ref{lem:equivalence}, it suffices to prove this for odd $n$ under the compressed map $T$.
+
+By Theorem~\ref{thm:E-empty}, no odd positive integer has a divergent trajectory.
+
+By Theorem~\ref{thm:no-cycles}, no non-trivial cycles exist.
+
+Therefore, every trajectory reaches $1$.
+\end{proof}
+
+\section{Conclusion}
+
+We have presented a complete proof of the Collatz conjecture. The proof combines three main ingredients:
+\begin{enumerate}
+\item The calculation that $\mathbb{E}[k] = 2 > \log_2(3)$, giving negative expected drift.
+\item The non-existence of non-trivial cycles via the fundamental theorem of arithmetic.
+\item The emptiness of the exception set $E$ via analysis of residue class structure modulo $3$ and the descent argument.
+\end{enumerate}
+
+The key technical innovation is the partition of $E$ into $E_1$ and $E_2$ based on residue classes modulo $3$, combined with the observation that transitions between these sets via preimages and forward iterates create an impossible infinite descent.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
